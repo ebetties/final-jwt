@@ -177,7 +177,7 @@ app.post('/budget', async (req, res) => {
 });
 
 // Update existing data in MongoDB by title
-app.put('/budget/:title', async (req, res) => {
+app.put('/budget/${title}', async (req, res) => {
   try {
     const { title } = req.params;
     const { related_value, color } = req.body;
