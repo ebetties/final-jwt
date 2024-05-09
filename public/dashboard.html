@@ -393,7 +393,7 @@
         };
 
         // Send a POST request to add the new item
-        axios.get('/budget', newItem)
+        axios.post('/budget', newItem)
             .then(response => {
                 // Item added successfully, refresh the UI
                 fetchDataAndRefreshUI();
@@ -407,38 +407,37 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-    // Update Budget Item Form Submission
-    document.getElementById('updateBudgetItemForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-        
-        // Get values from the form
-        const title = document.getElementById('updateTitle').value;
-        const value = document.getElementById('updateValue').value;
-        const color = document.getElementById('updateColor').value;
 
-        // Create an object with updated item details
-        const updatedItem = {
-            related_value: value,
-            color: color
-        };
+        // Update Budget Item Form Submission
+document.getElementById('updateBudgetItemForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    
+    // Get values from the form
+    const title = document.getElementById('updateTitle').value;
+    const value = document.getElementById('updateValue').value;
+    const color = document.getElementById('updateColor').value;
 
-        // Send updated data to the server
-        axios.put('/budget/${title}', updatedItem)
+    // Create an object with updated item details
+    const updatedItem = {
+        related_value: value,
+        color: color
+    };
 
-            .then(response => {
-                // Handle successful update
-                console.log('Item updated successfully:', response.data);
-                // Update UI after successful update
-                fetchDataAndRefreshUI();
-                location.reload(); // Reload the page
-            })
-            .catch(error => {
-                // Handle update error
-                console.error('Error updating item:', error);
-                // Display error message to the user
-                alert('An error occurred while updating the item. Please try again later.');
-            });
-    });
+    // Send updated data to the server
+    axios.put(`/budget/${title}`, updatedItem)
+        .then(response => {
+            // Handle successful update
+            console.log('Item updated successfully:', response.data);
+            // Update UI after successful update
+            fetchDataAndRefreshUI();
+        })
+        .catch(error => {
+            // Handle update error
+            console.error('Error updating item:', error);
+            // Display error message to the user
+            alert('An error occurred while updating the item. Please try again later.');
+        });
+});
 
 });
 
