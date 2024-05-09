@@ -21,8 +21,11 @@ app.use(bodyParser.json());
 app.use(compression());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://doadmin:07JndKlv94851ab3@mybudget-ad997177.mongo.ondigitalocean.com/myBudget?tls=true&authSource=admin&replicaSet=mybudget',{
+//mongoose.connect('mongodb+srv://doadmin:07JndKlv94851ab3@mybudget-ad997177.mongo.ondigitalocean.com/myBudget?tls=true&authSource=admin&replicaSet=mybudget',{
+
+mongoose.connect('mongodb+srv://doadmin:07JndKlv94851ab3@mybudget-ad997177.mongo.ondigitalocean.com/admin?tls=true&authSource=admin',{
   useNewUrlParser: true,
+  
   useUnifiedTopology: true
 })
 .then(() => {
