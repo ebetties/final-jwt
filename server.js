@@ -23,7 +23,7 @@ app.use(compression());
 // Connect to MongoDB
 //mongoose.connect('mongodb+srv://doadmin:07JndKlv94851ab3@mybudget-ad997177.mongo.ondigitalocean.com/myBudget?tls=true&authSource=admin&replicaSet=mybudget',{
 
-mongoose.connect('mongodb+srv://doadmin:07JndKlv94851ab3@mybudget-ad997177.mongo.ondigitalocean.com/admin?tls=true&authSource=admin',{
+mongoose.connect('mongodb+srv://doadmin:6G9wtBR085Yg31P7@mybudget-ad997177.mongo.ondigitalocean.com/admin?tls=true&authSource=admin&replicaSet=mybudget',{
   useNewUrlParser: true,
   
   useUnifiedTopology: true
