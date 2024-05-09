@@ -47,7 +47,6 @@
     </footer>
 
     <script src="auth.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
 
     <script>
@@ -66,70 +65,28 @@
                 return;
             }
             
-            // Show login feedback
-            var loginFeedback = document.getElementById("loginFeedback");
-            loginFeedback.style.display = "none";
-            
-
-
-// Get the value of the email input field
-
-// Wrap the script inside a function
-function loginUser() {
-        // Get the value of the email input field
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        // Send the login request with the email and password
-        axios.post('http://localhost:3000/login', { email, password })
-            .then(response => {
-                window.location.href = '/dashboard'; // Redirect to the dashboard page
-            })
-            .catch(error => {
-                console.error('Error logging in:', error);
-                // Handle login error
-                alert('Invalid email or password');
-            });
-    }
-
-    // Call the function after the DOM has loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        loginUser();
-    });
-
-
-
             // Send the login request to the backend server
             axios.post("/login", { email: email, password: password })
                 .then(function(response) {
-                    // Check if login was successful (server should return a JWT token)
-                    // if (response.data && response.data.token) { // Commented out JWT
-                        // Store the token securely (e.g., in local storage)
-                        // localStorage.setItem("token", response.data.token); // Commented out JWT
+                    // Check if login was successful
+                    if (response.data && response.data.token) {
                         // Redirect to the dashboard page
                         window.location.href = "dashboard.html";
-                    // } else { // Commented out JWT
-                        // Handle login failure (e.g., display an error message)
-                        // loginFeedback.innerText = "Invalid email or password."; // Commented out JWT
-                        // loginFeedback.style.display = "block"; // Commented out JWT
-                    // } // Commented out JWT
+                    } else {
+                        // Handle login failure
+                        var loginFeedback = document.getElementById("loginFeedback");
+                        loginFeedback.innerText = "Invalid email or password.";
+                        loginFeedback.style.display = "block";
+                    }
                 })
                 .catch(function(error) {
-                    // Check if the error is a 401 Unauthorized error
-                    // if (error.response && error.response.status === 401) { // Commented out JWT
-                        // Handle 401 error (e.g., display an error message)
-                        // loginFeedback.innerText = "Unauthorized: Incorrect email or password."; // Commented out JWT
-                        // loginFeedback.style.display = "block"; // Commented out JWT
-                    // } else { // Commented out JWT
-                        // Handle other errors (e.g., display a generic error message)
-                        console.error("Login error:", error);
-                        loginFeedback.innerText = "An error occurred while logging in. Please try again later.";
-                        loginFeedback.style.display = "block";
-                    // } // Commented out JWT
+                    // Handle login error
+                    console.error("Login error:", error);
+                    var loginFeedback = document.getElementById("loginFeedback");
+                    loginFeedback.innerText = "An error occurred while logging in. Please try again later.";
+                    loginFeedback.style.display = "block";
                 });
         });
-
-       
-
     </script>
 </body>
 </html>
