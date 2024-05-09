@@ -97,6 +97,15 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
+// Serve the dashboard HTML file
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+
+
+
 // Middleware to verify JWT token
 function verifyToken(req, res, next) {
   const token = req.cookies.token;
