@@ -9,12 +9,17 @@
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="main.css">
 </head>
-<body onload="fetchDataAndRefreshUI()">
+<body>
     <a class="skip-to-content-link" href="#main">Skip to content</a>
 
     <nav>
         <ul>
-            <li><a href="./logout.html">Logout</a></li>
+            <li><a href="./signout.html">Signout</a></li>
+        
+           
+           
+
+            <li><a href="https://google.com">Google</a></li>
         </ul>
     </nav>
 
@@ -23,35 +28,90 @@
         <h2>A personal-budget management app</h2>
     </div>
 
+    
     <main class="center" id="main">
-        <form id="addItemForm">
-            <!-- Form for adding items -->
+        <div class="page-area">
+
+        
+                <div class="budget-input">
+                    <h3><label for="monthlyBudget">Enter Your Budget for the Month:</label></h3>
+                    <input type="number" id="monthlyBudget" required>
+                    <button id="setBudgetBtn">Set Budget</button>
+                </div><br>
+             
+
+            <!-- Add this div to display the total budget -->
+<h2 id="totalBudget"></h2>
+<h2 id="budgetUsed"></h2>
+<h2 id="budgetOverUnder"></h2>
+     <!-- Add Budget Item Form -->
+     <article>
+        <h2>Add Item to the Budget</h2>
+        <form id="addBudgetItemForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required><br><br>
+            
+            <label for="value">Value:</label>
+            <input type="number" id="value" name="value" required><br><br>
+            
+            <label for="color">Color:</label>
+            <input type="color" id="color" name="color" value="#ff0000"><br><br>
+            
+            <button type="submit">Add Item</button>
         </form>
+    </article>
 
-        <form id="updateItemForm">
-            <!-- Form for updating items -->
+   <!-- Update Budget Item Form -->
+<article>
+    <h2>Update Budget Item</h2>
+    <form id="updateBudgetItemForm">
+        <label for="updateTitle">Title:</label>
+        <input type="text" id="updateTitle" name="updateTitle" required><br><br>
+        
+        <label for="updateValue">Value:</label>
+        <input type="number" id="updateValue" name="updateValue" required><br><br>
+        
+        <label for="updateColor">Color:</label>
+        <input type="color" id="updateColor" name="updateColor" value="#ff0000"><br><br>
+
+        <button type="submit">Update Item</button>
+    </form>
+</article>
+
+
+    <!-- Delete Budget Item Form -->
+    <article>
+        <h2>Delete Budget Item</h2>
+        <form id="deleteBudgetItemForm">
+            <label for="deleteTitle">Title:</label>
+            <input type="text" id="deleteTitle" name="deleteTitle" required><br><br>
+            
+            <button type="submit">Delete Item</button>
         </form>
+    </article>
+            <!-- Chart with D3.js -->
 
-        <form id="deleteItemForm">
-            <!-- Form for deleting items -->
-        </form>
 
-        <article>
-            <h2>Chart with D3.js</h2>
-            <svg id="d3Chart" width="600" height="600"></svg>
-        </article>
+            <article>
+                <h2>Chart with D3.js</h2>
+                <svg id="d3Chart" width="400" height="400"></svg>
+            </article>
 
-        <article>
-            <h2>Chart with Chart.js</h2>
-            <canvas id="chartjsChart" width="600" height="400"></canvas>
-        </article>
+            <!-- Chart with Chart.js -->
+            <article>
+                <h2>Chart with Chart.js</h2>
+                <canvas id="chartjsChart" width="400" height="400"></canvas>
+            </article>
 
-        <article>
-            <h2>Bar Chart with D3.js</h2>
-            <svg id="barChart" width="600" height="400"></svg>
-        </article>
+            <!-- Bar Chart with D3.js -->
+            <article>
+                <h2>Bar Chart with D3.js</h2>
+                <svg id="d3BarChart" width="400" height="400"></svg>
+            </article>
+        </div>
 
-        <ul id="itemList"></ul> <!-- Add this line -->
+
+       <br><br><br></br> <button id="newBudgetBtn">New/Reset Budget</button>
     </main>
 
     <footer class="bottom">
@@ -61,18 +121,214 @@
         </div>
     </footer>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
-    
+
     <script>
+
+
+
+
+        
+        axios.get('http://localhost:3000/budget')
+            .then(response => {
+                const responseData = response.data;
+                
+                // Data for D3.js
+                const d3Data = responseData.map(item => ({
+                    title: item.title,
+                    value: item.related_value // Corrected property name from budget to value
+                }));
+                
+                // Data for Chart.js
+                const chartjsData = {
+                    datasets: [{
+                        data: responseData.map(item => item.related_value),
+                        backgroundColor: responseData.map(item => item.color)
+                    }],
+                    labels: responseData.map(item => item.title)
+                };
+
+                createD3Chart(d3Data);
+                createChartJsChart(chartjsData);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
+        // Function to create D3.js chart
+        function createD3Chart(data) {
+            var width = 300,
+                height = 300,
+                radius = Math.min(width, height) / 2;
+
+            var color = d3.scale.category20();
+
+            var arc = d3.svg.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var pie = d3.layout.pie()
+                .sort(null)
+                .value(function(d) { return d.value; });
+
+            var svg = d3.select("#d3Chart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            var g = svg.selectAll(".arc")
+                .data(pie(data))
+                .enter().append("g")
+                .attr("class", "arc");
+
+            g.append("path")
+                .attr("d", arc)
+                .style("fill", function(d) { return color(d.data.title); });
+
+            g.append("text")
+                .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                .attr("dy", ".35em")
+                .style("text-anchor", "middle")
+                .text(function(d) { return d.data.title; });
+
+            // Add polylines
+            g.append("polyline")
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+                .attr("fill", "none")
+                .attr("points", function(d) {
+                    var labelPoint = arc.centroid(d);
+                    labelPoint[0] = radius * 0.95 * (labelPoint[0] / Math.sqrt(labelPoint[0] * labelPoint[0] + labelPoint[1] * labelPoint[1]));
+                    labelPoint[1] = radius * 0.95 * (labelPoint[1] / Math.sqrt(labelPoint[0] * labelPoint[0] + labelPoint[1] * labelPoint[1]));
+                    return [arc.centroid(d), labelPoint];
+                });
+
+            // Move the title to the end of the polyline
+            g.selectAll("text")
+                .attr("transform", function(d) {
+                    var labelPoint = arc.centroid(d);
+                    labelPoint[0] = radius * 0.95 * (labelPoint[0] / Math.sqrt(labelPoint[0] * labelPoint[0] + labelPoint[1] * labelPoint[1]));
+                    labelPoint[1] = radius * 0.95 * (labelPoint[1] / Math.sqrt(labelPoint[0] * labelPoint[0] + labelPoint[1] * labelPoint[1]));
+                    return "translate(" + labelPoint + ")";
+                });
+        }
+
+        // Function to create Chart.js chart
+        function createChartJsChart(data) {
+            var ctx = document.getElementById("chartjsChart").getContext("2d");
+            var chartjsChart = new Chart(ctx, {
+                type: 'pie',
+                data: data
+            });
+        }
+
+        // Function to create D3.js bar chart
+        function createD3BarChart(data) {
+            var margin = { top: 20, right: 20, bottom: 30, left: 40 },
+                width = 400 - margin.left - margin.right,
+                height = 400 - margin.top - margin.bottom;
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+            var y = d3.scale.linear()
+                .range([height, 0]);
+
+            var color = d3.scale.category20(); // Define color scale
+
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left");
+
+            var svg = d3.select("#d3BarChart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            x.domain(data.map(function(d) { return d.title; }));
+            y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Value");
+
+            svg.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.title); })
+                .attr("width", x.rangeBand())
+                .attr("y", function(d) { return y(d.value); })
+                .attr("height", function(d) { return height - y(d.value); })
+                .style("fill", function(d) { return color(d.value); }); // Set bar color based on data value
+        }
+
+
+        
+
+        axios.get('http://localhost:3000/budget')
+    .then(response => {
+        const responseData = response.data;
+
+        // Calculate total budget for the month
+        const totalBudget = responseData.reduce((acc, item) => acc + item.related_value, 0);
+
+        // Render total budget in HTML
+        document.getElementById('budgetUsed').textContent = `Budget Used: $${totalBudget}`;
+
+        // You may want to fetch the budget for the month from another endpoint or calculate it in some other way
+        
+        // For demonstration purposes, let's assume the budget for the month is $2000
+        const budgetForMonth = 2000;
+
+        // Calculate budget over/under amount
+        const budgetOverUnder = totalBudget - budgetForMonth;
+
+        // Render budget over/under amount in HTML
+        const budgetOverUnderText = budgetOverUnder >= 0 ? `Budget Over: $${budgetOverUnder}` : `Budget Under: $${-budgetOverUnder}`;
+        document.getElementById('budgetOverUnder').textContent = budgetOverUnderText;
+                
+                // Data for D3.js bar chart
+                const d3BarData = responseData.map(item => ({
+                    title: item.title,
+                    value: item.related_value // Corrected property name from budget to value
+                }));
+                
+                createD3BarChart(d3BarData);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
         function logout() {
             localStorage.removeItem("token");
             window.location.href = "index.html";
         }
-    
+
         function fetchDataAndRefreshUI() {
-            axios.get('http://localhost:3000/myBudget')
+            axios.get('http://localhost:3000/budget')
                 .then(response => {
                     const responseData = response.data;
                     updateUI(responseData);
@@ -115,152 +371,187 @@
             createChartJsChart(chartjsData);
             createBarChart(d3Data);
         }
+
+
+    
+    // Function to handle form submission for adding a budget item
+    document.getElementById('addBudgetItemForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
         
-        function createD3Chart(data) {
-            // D3.js chart creation function
-        }
+        // Get the form values
+        const title = document.getElementById('title').value;
+        const value = document.getElementById('value').value;
+        const color = document.getElementById('color').value;
 
-        function createChartJsChart(data) {
-            // Chart.js chart creation function
-        }
+        // Create a new item object
+        const newItem = {
+            title: title,
+            related_value: value,
+            color: color
+        };
 
-        function createBarChart(data) {
-            // Bar chart creation function
-        }
-    </script>
-</body>
-</html>
+        // Send a POST request to add the new item
+        axios.post('http://localhost:3000/budget', newItem)
+            .then(response => {
+                // Item added successfully, refresh the UI
+                fetchDataAndRefreshUI();
+                location.reload(); // Reload the page
+            })
+            .catch(error => {
+                console.error('Error adding item:', error);
+                // Display an error message to the user
+                alert('An error occurred while adding the item. Please try again later.');
+            });
+    });
 
+    document.addEventListener('DOMContentLoaded', function() {
+    // Update Budget Item Form Submission
+    document.getElementById('updateBudgetItemForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        
+        // Get values from the form
+        const title = document.getElementById('updateTitle').value;
+        const value = document.getElementById('updateValue').value;
+        const color = document.getElementById('updateColor').value;
+
+        // Create an object with updated item details
+        const updatedItem = {
+            related_value: value,
+            color: color
+        };
+
+        // Send updated data to the server
+        axios.put(`http://localhost:3000/budget/${title}`, updatedItem)
+            .then(response => {
+                // Handle successful update
+                console.log('Item updated successfully:', response.data);
+                // Update UI after successful update
+                fetchDataAndRefreshUI();
+                location.reload(); // Reload the page
+            })
+            .catch(error => {
+                // Handle update error
+                console.error('Error updating item:', error);
+                // Display error message to the user
+                alert('An error occurred while updating the item. Please try again later.');
+            });
+    });
+
+});
+
+
+
+
+
+
+
+// Delete Budget Item Form Submission
+document.getElementById('deleteBudgetItemForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    
+    const title = document.getElementById('deleteTitle').value;
+
+    // Send a DELETE request to delete the item by its title
+    axios.delete('http://localhost:3000/budget/' + title)
+    .then(response => {
+        // Item deleted successfully
+        fetchDataAndRefreshUI();
+                location.reload(); // Reload the page
+    })
+    .catch(error => {
+        if (error.response && error.response.status === 404) {
+            // Handle 404 error (item not found)
+            console.error('Item not found:', error);
+            alert('The item you are trying to delete does not exist.');
+        } else {
+            // Handle other errors
+            console.error('Error deleting item:', error);
+            alert('An error occurred while deleting the item. Please try again later.');
+        }
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch budget data and refresh UI
+    fetchDataAndRefreshUI();
+
+    // Set budget button click event listener
+    document.getElementById('setBudgetBtn').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        // Get the entered budget value
+        const monthlyBudget = document.getElementById('monthlyBudget').value;
+
+        // Validate the budget value
+        if (!isNaN(monthlyBudget) && monthlyBudget > 0) {
+            // Store the budget value in localStorage
+            localStorage.setItem('monthlyBudget', monthlyBudget);
+
+            // Fetch budget data and refresh UI
+            fetchDataAndRefreshUI();
+        } else {
+            alert('Please enter a valid budget amount.');
+        }
+    });
+});
+
+document.getElementById('newBudgetBtn').addEventListener('click', function() {
+  axios.post('http://localhost:3000/new-budget')
+    .then(response => {
+      alert('New budget created successfully');
+      // Optionally, you can reload the page or update the UI as needed
+    })
+    .catch(error => {
+      console.error('Error creating new budget:', error);
+      alert('An error occurred while creating the new budget. Please try again later.');
+    });
+});
+
+
+function fetchDataAndRefreshUI() {
+    // Get the stored monthly budget value from localStorage
+    const storedBudget = localStorage.getItem('monthlyBudget');
+
+    // Check if a budget is already set
+    if (storedBudget !== null) {
+        // Fetch budget data from server
+        axios.get('http://localhost:3000/budget')
+            .then(response => {
+                const responseData = response.data;
+
+                // Calculate total budget for the month
+                const totalBudget = responseData.reduce((acc, item) => acc + item.related_value, 0);
+
+                // Render total budget in HTML
+                document.getElementById('budgetUsed').textContent = `Budget Used: $${totalBudget}`;
+
+                // Parse the stored budget to a number
+                const budgetForMonth = parseFloat(storedBudget);
+
+                // Calculate budget over/under amount
+                const budgetOverUnder = totalBudget - budgetForMonth;
+
+                // Render budget over/under amount in HTML
+                const budgetOverUnderText = budgetOverUnder >= 0 ? `Over Budget by: $${budgetOverUnder}` : `Under Budget by: $${-budgetOverUnder}`;
+                const budgetOverUnderElement = document.getElementById('budgetOverUnder'); // Added this line
+                budgetOverUnderElement.textContent = budgetOverUnderText;
+
+                // Change text color based on budget over/under
+                if (budgetOverUnder >= 0) {
+                    budgetOverUnderElement.style.color = 'red'; // Budget over, set text color to red
+                } else {
+                    budgetOverUnderElement.style.color = 'green'; // Budget under, set text color to green
+                }
+            })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-
-  // Function to create D3.js chart
-function createD3Chart(data) {
-    var width = 600,
-        height = 600,
-        radius = Math.min(width, height) / 3;
-
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-    var arc = d3.arc()
-        .outerRadius(radius - 10)
-        .innerRadius(0);
-
-    var outerArc = d3.arc()
-        .innerRadius(radius * 0.9)
-        .outerRadius(radius * 0.9);
-
-    var pie = d3.pie()
-        .sort(null)
-        .value(function(d) { return d.value; });
-
-    var svg = d3.select("#d3Chart")
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
-        .attr("width", width)
-        .attr("height", height);
-
-    var arcs = pie(data);
-
-    svg.selectAll("path")
-        .data(arcs)
-        .join("path")
-        .attr("fill", d => color(d.data.title))
-        .attr("d", arc)
-        .append("title")
-        .text(d => `${d.data.title}: ${d.data.value}`);
-
-    // Add polyline for each slice
-    svg.selectAll("polyline")
-        .data(arcs)
-        .enter().append("polyline")
-        .attr("stroke", "black")
-        .attr("stroke-width", 2)
-        .attr("fill", "none")
-        .attr("points", function(d) {
-            var pos = outerArc.centroid(d);
-            pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
-            return [arc.centroid(d), outerArc.centroid(d), pos];
-        });
-
-    // Add text for titles
-    svg.selectAll("text")
-        .data(arcs)
-        .enter()
-        .append("text")
-        .attr("transform", function(d) {
-            var pos = outerArc.centroid(d);
-            pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
-            return `translate(${pos})`;
-        })
-        .attr("dy", "0.35em")
-        .attr("text-anchor", function(d) {
-            return midAngle(d) < Math.PI ? "start" : "end";
-        })
-        .text(d => d.data.title + " $" + d.value);
-}
-
-// Calculate mid angle of the arc
-function midAngle(d) {
-    return d.startAngle + (d.endAngle - d.startAngle) / 2;
+    }
 }
 
 
-        // Function to create Chart.js chart
-        function createChartJsChart(data) {
-            var ctx = document.getElementById("chartjsChart").getContext("2d");
-            var chartjsChart = new Chart(ctx, {
-                type: 'pie',
-                data: data
-            });
-        }
-
-         // Function to create D3.js bar chart
-         function createBarChart(data) {
-            const margin = { top: 20, right: 30, bottom: 30, left: 40 };
-            const width = document.getElementById("main").offsetWidth * 0.45 - margin.left - margin.right; // 75% width of the main container
-            const height = 400 - margin.top - margin.bottom;
-
-            const svg = d3.select("#barChart")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleBand()
-                .domain(data.map(d => d.title))
-                .range([10, width])
-                .padding(0.4);
-
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.value)])
-                .range([height, 0]);
-
-            svg.selectAll(".bar")
-                .data(data)
-                .enter().append("rect")
-                .attr("class", "bar")
-                .attr("x", d => x(d.title))
-                .attr("width", x.bandwidth())
-                .attr("y", d => y(d.value))
-                .attr("height", d => height - y(d.value))
-                .attr("fill", d => d.color);
-
-            svg.selectAll("text")
-                .data(data)
-                .enter().append("text")
-                .attr("x", d => x(d.title) + x.bandwidth() / 2)
-                .attr("y", d => y(d.value) - 5)
-                .attr("text-anchor", "middle")
-                .text(d => "$" + d.value);
-
-            svg.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x));
-
-            svg.append("g")
-                .call(d3.axisLeft(y));
-        }
     </script>
+    
 </body>
 </html>

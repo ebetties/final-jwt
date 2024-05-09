@@ -15,17 +15,21 @@ const port = 3000;
 
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+  origin: 'https://lionfish-app-ywlj5.ondigitalocean.app/', // Update this with your frontend domain
+  credentials: true // Enable CORS credentials
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(compression());
+
 
 // Connect to MongoDB
 //mongoose.connect('mongodb+srv://doadmin:07JndKlv94851ab3@mybudget-ad997177.mongo.ondigitalocean.com/myBudget?tls=true&authSource=admin&replicaSet=mybudget',{
 
 mongoose.connect('mongodb+srv://doadmin:6G9wtBR085Yg31P7@mybudget-ad997177.mongo.ondigitalocean.com/admin?tls=true&authSource=admin&replicaSet=mybudget',{
   useNewUrlParser: true,
-  
   useUnifiedTopology: true
 })
 .then(() => {

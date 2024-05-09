@@ -132,7 +132,8 @@
 
 
         
-        axios.get('http://localhost:3000/budget')
+        axios.get('/budget')
+
             .then(response => {
                 const responseData = response.data;
                 
@@ -288,7 +289,8 @@
 
         
 
-        axios.get('http://localhost:3000/budget')
+        axios.get('/budget')
+
     .then(response => {
         const responseData = response.data;
 
@@ -328,7 +330,7 @@
         }
 
         function fetchDataAndRefreshUI() {
-            axios.get('http://localhost:3000/budget')
+            axios.get('/budget')
                 .then(response => {
                     const responseData = response.data;
                     updateUI(responseData);
@@ -391,7 +393,7 @@
         };
 
         // Send a POST request to add the new item
-        axios.post('http://localhost:3000/budget', newItem)
+        axios.get('/budget', newItem)
             .then(response => {
                 // Item added successfully, refresh the UI
                 fetchDataAndRefreshUI();
@@ -421,7 +423,8 @@
         };
 
         // Send updated data to the server
-        axios.put(`http://localhost:3000/budget/${title}`, updatedItem)
+        axios.put('/budget/${title}', updatedItem)
+
             .then(response => {
                 // Handle successful update
                 console.log('Item updated successfully:', response.data);
@@ -452,7 +455,7 @@ document.getElementById('deleteBudgetItemForm').addEventListener('submit', funct
     const title = document.getElementById('deleteTitle').value;
 
     // Send a DELETE request to delete the item by its title
-    axios.delete('http://localhost:3000/budget/' + title)
+    axios.delete('/budget/' + title)
     .then(response => {
         // Item deleted successfully
         fetchDataAndRefreshUI();
@@ -497,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.getElementById('newBudgetBtn').addEventListener('click', function() {
-  axios.post('http://localhost:3000/new-budget')
+  axios.post('/new-budget')
     .then(response => {
       alert('New budget created successfully');
       // Optionally, you can reload the page or update the UI as needed
@@ -516,7 +519,7 @@ function fetchDataAndRefreshUI() {
     // Check if a budget is already set
     if (storedBudget !== null) {
         // Fetch budget data from server
-        axios.get('http://localhost:3000/budget')
+        axios.get('/budget')
             .then(response => {
                 const responseData = response.data;
 
