@@ -121,6 +121,7 @@
         </div>
     </footer>
 
+    <script src="auth.js"></script>
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
@@ -439,7 +440,6 @@ if (!localStorage.getItem('token')) {
             });
     });
 
-    
 });
 
 
@@ -536,7 +536,7 @@ function fetchDataAndRefreshUI() {
                 const budgetOverUnder = totalBudget - budgetForMonth;
 
                 // Render budget over/under amount in HTML
-                const budgetOverUnderText = budgetOverUnder >= 0 ? `Budget Over: $${budgetOverUnder}` : `Budget Under: $${-budgetOverUnder}`;
+                const budgetOverUnderText = budgetOverUnder >= 0 ? `Over Budget by: $${budgetOverUnder}` : `Under Budget by: $${-budgetOverUnder}`;
                 const budgetOverUnderElement = document.getElementById('budgetOverUnder'); // Added this line
                 budgetOverUnderElement.textContent = budgetOverUnderText;
 
@@ -552,20 +552,6 @@ function fetchDataAndRefreshUI() {
             });
     }
 }
-
-
-
-axios.post('http://localhost:3000/login', { email, password })
-    .then(response => {
-        const token = response.data.token;
-        localStorage.setItem('token', token); // Store the token in local storage
-        window.location.href = '/dashboard'; // Redirect to the dashboard page
-    })
-    .catch(error => {
-        console.error('Error logging in:', error);
-        // Handle login error
-        alert('Invalid email or password');
-    });
 
 
     </script>
