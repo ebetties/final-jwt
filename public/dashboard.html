@@ -430,6 +430,7 @@ document.getElementById('updateBudgetItemForm').addEventListener('submit', funct
             console.log('Item updated successfully:', response.data);
             // Update UI after successful update
             fetchDataAndRefreshUI();
+            location.reload(); // Reload the page
         })
         .catch(error => {
             // Handle update error
