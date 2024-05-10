@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use(cors({
-  origin: 'https://lionfish-app-ywlj5.ondigitalocean.app/', // Update this with your frontend domain
+  origin: 'https://clownfish-app-i5k6s.ondigitalocean.app/', // Update this with your frontend domain
   credentials: true // Enable CORS credentials
 }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -230,6 +230,11 @@ app.post('/new-budget', async (req, res) => {
 
 
 
+// Add a new endpoint to clear token expiration
+app.post('/clear-expiration', (req, res) => {
+  res.clearCookie('token'); // Clear the token cookie
+  res.json({ message: 'Token expiration cleared successfully' });
+});
 
 
 
